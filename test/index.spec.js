@@ -1,70 +1,51 @@
-import {expect} from 'chai';
+import test from 'ava';
 import EventEmitter from 'events';
 import eventIterator from '../src/index';
 
 class MockEmitter extends EventEmitter {}
 
-describe('eventIterator', () => {
-  it('throws error on invalid arguments', () => {
-    const mockEmitter = {on: () => true};
+test('throws error on invalid arguments', (t) => {
+  const mockEmitter = {on: () => true};
 
-    expect(() => eventIterator()).to.throw(Error);
-    expect(() => eventIterator('a')).to.throw(Error);
-    expect(() => eventIterator(true)).to.throw(Error);
-    expect(() => eventIterator({})).to.throw(Error);
-    expect(() => eventIterator(mockEmitter)).to.throw(Error);
-    expect(() => eventIterator(mockEmitter, '')).to.throw(Error);
-    expect(() => eventIterator(mockEmitter, 1)).to.throw(Error);
-    expect(() => eventIterator(mockEmitter, {})).to.throw(Error);
-    expect(() => eventIterator(mockEmitter, true)).to.throw(Error);
-    expect(() => eventIterator({}, 'name')).to.throw(Error);
-    expect(() => eventIterator(true, 'name')).to.throw(Error);
-    expect(() => eventIterator('a', 'name')).to.throw(Error);
-  });
+  t.throws(() => eventIterator());
+  t.throws(() => eventIterator('a'));
+  t.throws(() => eventIterator(true));
+  t.throws(() => eventIterator({}));
+  t.throws(() => eventIterator(mockEmitter));
+  t.throws(() => eventIterator(mockEmitter, ''));
+  t.throws(() => eventIterator(mockEmitter, 1));
+  t.throws(() => eventIterator(mockEmitter, {}));
+  t.throws(() => eventIterator(mockEmitter, true));
+  t.throws(() => eventIterator({}, 'name'));
+  t.throws(() => eventIterator(true, 'name'));
+  t.throws(() => eventIterator('a', 'name'));
+});
 
-  it('throws error if Promise not available', () => {
-    const mockEmitter = {on: () => true};
-    const oldPromise = Promise;
-    global.Promise = undefined;
+test('throws error if Promise not available', (t) => {
+  const mockEmitter = {on: () => true};
+  const oldPromise = Promise;
+  global.Promise = undefined;
 
-    expect(() => eventIterator(mockEmitter, 'name')).to.throw(Error);
+  t.throws(() => eventIterator(mockEmitter, 'name'));
 
-    global.Promise = oldPromise;
-  });
+  global.Promise = oldPromise;
+});
 
-  it('resolves promise when event emitted', (done) => {
-    const mockEmitter = new MockEmitter();
-    const {nextEvent} = eventIterator(mockEmitter, 'someEvent');
-    const promise = nextEvent();
-    const payloads = [{a: 1}, {b: 2}];
-    let resolved, resolvedSecond;
+test('iterator runs in sequence', function * (t) {
+  const mockEmitter = new MockEmitter();
+  const {nextEvent} = eventIterator(mockEmitter, 'someEvent');
+  const payloads = [{a: 1}, {b: 2}];
 
-    resolved = false;
-    resolvedSecond = false;
+  setTimeout(() => {
+    mockEmitter.emit('someEvent', payloads[0]);
+  }, 50);
+  setTimeout(() => {
+    mockEmitter.emit('someEvent', payloads[1]);
+  }, 100);
 
-    expect(promise).to.be.a('Promise');
+  const firstValue = yield nextEvent();
+  t.is(firstValue, payloads[0]);
 
-    promise.then((firstValue) => {
-      resolved = true;
-      expect(firstValue).to.be.eql(payloads[0]);
-
-      const nextPromise = nextEvent();
-
-      nextPromise.then((secondValue) => {
-        resolvedSecond = true;
-        expect(secondValue).to.be.eql(payloads[1]);
-        done();
-      });
-
-      expect(resolvedSecond).to.be.eql(false);
-      setTimeout(() => {
-        mockEmitter.emit('someEvent', payloads[1]);
-      }, 50);
-    });
-
-    expect(resolved).to.be.eql(false);
-    setTimeout(() => {
-      mockEmitter.emit('someEvent', payloads[0]);
-    }, 50);
-  });
+  const secondValue = yield nextEvent();
+  t.is(secondValue, payloads[1]);
 });

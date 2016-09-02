@@ -1,6 +1,7 @@
 # redux-saga-event-iterator
 
 [![Build Status][travis-image]][travis-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
 An easy way of consuming an EventEmitter (e.g. [socket.io][socket-io]) in [redux-saga][redux-saga]
 
@@ -57,4 +58,6 @@ MIT - see [LICENSE][license-url]
 [socket-io]: https://github.com/socketio/socket.io
 [travis-image]: https://travis-ci.org/claudiorodriguez/ngrammer.svg?branch=master
 [travis-url]: https://travis-ci.org/claudiorodriguez/ngrammer
+[coveralls-image]: https://coveralls.io/repos/github/claudiorodriguez/redux-saga-event-iterator/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/github/claudiorodriguez/redux-saga-event-iterator?branch=master
 [license-url]: ./LICENSE
