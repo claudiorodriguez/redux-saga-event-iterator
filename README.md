@@ -56,8 +56,8 @@ MIT - see [LICENSE][license-url]
 
 [redux-saga]: https://github.com/yelouafi/redux-saga
 [socket-io]: https://github.com/socketio/socket.io
-[travis-image]: https://travis-ci.org/claudiorodriguez/ngrammer.svg?branch=master
-[travis-url]: https://travis-ci.org/claudiorodriguez/ngrammer
+[travis-image]: https://travis-ci.org/claudiorodriguez/redux-saga-event-iterator.svg?branch=master
+[travis-url]: https://travis-ci.org/claudiorodriguez/redux-saga-event-iterator
 [coveralls-image]: https://coveralls.io/repos/github/claudiorodriguez/redux-saga-event-iterator/badge.svg?branch=master
 [coveralls-url]: https://coveralls.io/github/claudiorodriguez/redux-saga-event-iterator?branch=master
 [license-url]: ./LICENSE
