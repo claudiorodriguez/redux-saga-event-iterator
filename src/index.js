@@ -11,17 +11,22 @@ const eventIterator = (emitter, eventName) => {
     throw new Error('eventName must be a string');
   }
 
-  let deferred;
-
-  emitter.on(eventName, (payload) => {
+  let deferred, removedListener = false;
+  const listener = (payload) => {
     if (deferred) {
       deferred.resolve(payload);
       deferred = null;
     }
-  });
+  };
+
+  emitter.on(eventName, listener);
 
   return {
     nextEvent () {
+      if (removedListener) {
+        throw new Error('listener has been removed');
+      }
+
       if (!deferred) {
         deferred = {};
         deferred.promise = new Promise((resolve) => {
@@ -30,6 +35,10 @@ const eventIterator = (emitter, eventName) => {
       }
 
       return deferred.promise;
+    },
+    removeListener () {
+      emitter.removeListener(eventName, listener);
+      removedListener = true;
     }
   };
 };

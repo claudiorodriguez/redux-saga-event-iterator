@@ -23,13 +23,16 @@ import io from 'socket.io-client';
 const socketClient = io('localhost:12345');
 
 const listenerSaga = function * (eventName) {
-  const {nextEvent} = yield call(eventIterator, socketClient, eventName);
+  const {nextEvent, removeListener} = yield call(eventIterator, socketClient, eventName);
 
   while (true) {
     const payload = yield call(nextEvent);
 
     // Do something with payload
   }
+
+  // Optionally remove listener, further calls to nextEvent will throw an error
+  yield call(removeListener);
 };
 ```
 

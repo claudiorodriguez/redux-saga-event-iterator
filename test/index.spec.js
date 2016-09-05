@@ -49,3 +49,22 @@ test('iterator runs in sequence', function * (t) {
   const secondValue = yield nextEvent();
   t.is(secondValue, payloads[1]);
 });
+
+test('stop listening after removeListener called', function * (t) {
+  const mockEmitter = new MockEmitter();
+  const {nextEvent, removeListener} = eventIterator(mockEmitter, 'someEvent');
+  const payloads = [{a: 1}, {b: 2}];
+
+  setTimeout(() => {
+    mockEmitter.emit('someEvent', payloads[0]);
+    removeListener();
+  }, 50);
+  setTimeout(() => {
+    mockEmitter.emit('someEvent', payloads[1]);
+  }, 100);
+
+  const firstValue = yield nextEvent();
+
+  t.is(firstValue, payloads[0]);
+  t.throws(() => nextEvent());
+});
